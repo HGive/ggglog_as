@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: ggglog-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=${DB_USER:-ggglog}
+      - DB_PASSWORD=${DB_PASSWORD:-ggglog_password}
+      - DB_NAME=${DB_NAME:-ggglog_as}
+      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key_here_min_32_chars}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-http://localhost:3000}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ggglog-network
+
+  db:
+    image: mariadb:10.11
+    container_name: ggglog-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root_password}
+      - MYSQL_DATABASE=${DB_NAME:-ggglog_as}
+      - MYSQL_USER=${DB_USER:-ggglog}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-ggglog_password}
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ggglog-network
+
+volumes:
+  mariadb_data:
+  uploads:
+
+networks:
+  ggglog-network:
+    driver: bridge
