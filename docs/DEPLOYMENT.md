@@ -37,6 +37,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 # 설치 확인
 docker --version
 docker-compose --version
+docker compose version
 ```
 
 ---
@@ -56,6 +57,9 @@ git clone https://github.com/your-repo/ggglog_as.git .
 ```
 
 ### 2.2 환경변수 설정
+
+Docker Compose는 같은 디렉토리의 `.env` 파일을 자동으로 읽어서 `${변수명}` 부분을 대체합니다.
+
 ```bash
 # .env 파일 생성
 cp .env.example .env
@@ -80,7 +84,7 @@ JWT_SECRET=32자_이상의_랜덤_문자열_입력
 # Admin Email
 ADMIN_EMAIL=admin@yourdomain.com
 
-# SMTP
+# SMTP (Gmail 앱 비밀번호: https://myaccount.google.com/apppasswords)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=your_email@gmail.com
@@ -91,6 +95,9 @@ SMTP_FROM=공간기록 A/S센터 <your_email@gmail.com>
 NEXT_PUBLIC_BASE_URL=https://yourdomain.com
 ```
 
+> 💡 **참고**: `docker-compose.yml`의 `${DB_USER:-ggglog}` 문법은 
+> "DB_USER 환경변수가 있으면 그 값을 쓰고, 없으면 ggglog를 기본값으로 사용"이라는 의미입니다.
+
 ### 2.3 Docker Compose로 DB만 먼저 실행
 ```bash
 # MariaDB만 먼저 실행
@@ -100,7 +107,16 @@ docker-compose up -d db
 docker-compose logs -f db
 ```
 
-### 2.4 DBeaver로 DB 접속 및 테이블 생성
+> ⚠️ **보안 주의**: 현재 설정에서 DB 포트(3306)가 외부에 노출되어 있습니다.
+> 프로덕션 환경에서는 DBeaver 접속이 필요 없다면 `docker-compose.yml`에서 
+> DB의 `ports` 항목을 주석 처리하거나 삭제하는 것을 권장합니다.
+
+### 2.4 DB 초기화 확인
+
+> ✅ **자동 초기화**: `init.sql`은 Docker 컨테이너 첫 실행 시 자동으로 실행됩니다.
+> 테이블 생성 및 기본 관리자 계정(admin/admin123)이 자동 생성됩니다.
+
+DBeaver로 접속하여 테이블이 제대로 생성되었는지 확인:
 1. DBeaver에서 새 연결 생성
    - Host: 서버 IP
    - Port: 3306
@@ -108,14 +124,31 @@ docker-compose logs -f db
    - User: ggglog
    - Password: .env에 설정한 비밀번호
 
-2. `init.sql` 파일 내용 실행하여 테이블 생성
+2. `applications`, `attachments`, `admins` 테이블 확인
 
-### 2.5 관리자 계정 생성
+> ⚠️ **주의**: init.sql은 DB 볼륨이 비어있을 때만 자동 실행됩니다.
+> 이미 실행된 적이 있다면 수동으로 실행하거나 볼륨 삭제 후 재시작:
+> ```bash
+> docker-compose down -v  # 볼륨 포함 삭제
+> docker-compose up -d db
+> ```
+
+### 2.5 관리자 비밀번호 변경 (권장)
+
+기본 관리자 계정: **admin / admin123** (반드시 변경하세요!)
+
 ```bash
-# 로컬에서 비밀번호 해시 생성 (또는 서버에서)
-node scripts/create-admin.js admin your_password admin@example.com
+# 방법 1: 로컬에서 새 비밀번호 해시 생성
+node -e "require('bcryptjs').hash('새로운비밀번호', 10).then(console.log)"
 
-# 출력된 SQL을 DBeaver에서 실행
+# 출력된 해시를 DBeaver에서 업데이트
+UPDATE admins SET password='출력된_해시값' WHERE username='admin';
+```
+
+```bash
+# 방법 2: 스크립트 사용 (DB 직접 연결 가능한 경우)
+# 서버에서 실행하거나, 로컬에서 서버 DB로 연결 설정 후
+node scripts/create-admin.js admin 새로운비밀번호 admin@example.com
 ```
 
 ---

@@ -167,7 +167,7 @@ export default function GuidePage() {
     setMatchCount(count)
     setCurrentMatchIndex(count > 0 ? 1 : 0)
 
-    const highlighted = GUIDE_CONTENT.replace(regex, '<mark class="search-highlight">$1</mark>')
+    const highlighted = GUIDE_CONTENT.replace(regex, '<mark class="search-highlight" style="scroll-margin-top: 200px;">$1</mark>')
     setHighlightedContent(highlighted)
 
     // 첫 번째 매치로 스크롤
@@ -243,14 +243,14 @@ export default function GuidePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-12">
-      {/* 타이틀 */}
-      <h1 className="font-handwriting text-5xl text-center mb-8">
-        living guide
-      </h1>
+    <div className="max-w-2xl mx-auto px-6 pb-12">
+      {/* 검색 영역 - 상단 고정 */}
+      <div className="sticky top-0 bg-white pt-6 pb-4 z-20 -mx-6 px-6 shadow-sm">
+        {/* 타이틀 */}
+        <h1 className="font-handwriting text-4xl text-center mb-4">
+          living guide
+        </h1>
 
-      {/* 검색 영역 */}
-      <div className="sticky top-16 bg-white py-4 z-10">
         <SearchInput
           placeholder="검색어를 입력하세요"
           onSearch={handleSearch}
@@ -262,18 +262,18 @@ export default function GuidePage() {
         />
         
         {matchCount > 0 && (
-          <div className="flex items-center justify-between mt-2 text-sm text-gray-500">
-            <span>{currentMatchIndex} / {matchCount}개 결과</span>
+          <div className="flex items-center justify-between mt-3 text-sm text-gray-500">
+            <span className="font-medium">{currentMatchIndex} / {matchCount}개 결과</span>
             <div className="flex gap-2">
               <button
                 onClick={goToPrevMatch}
-                className="px-3 py-1 border rounded hover:bg-gray-50"
+                className="px-3 py-1.5 border rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
               >
                 ← 이전
               </button>
               <button
                 onClick={goToNextMatch}
-                className="px-3 py-1 border rounded hover:bg-gray-50"
+                className="px-3 py-1.5 border rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors"
               >
                 다음 →
               </button>
@@ -281,15 +281,17 @@ export default function GuidePage() {
           </div>
         )}
 
-        <p className="text-center text-gray-500 mt-4">
-          집짓기 관리의 모든것, 무엇이 궁금하세요?
-        </p>
+        {matchCount === 0 && searchTerm === '' && (
+          <p className="text-center text-gray-500 mt-3 text-sm">
+            집짓기 관리의 모든것, 무엇이 궁금하세요?
+          </p>
+        )}
       </div>
 
       {/* 콘텐츠 */}
       <div
         ref={contentRef}
-        className="prose prose-gray max-w-none mt-8"
+        className="prose prose-gray max-w-none mt-6 scroll-mt-48"
         dangerouslySetInnerHTML={{ __html: renderContent(highlightedContent) }}
       />
     </div>

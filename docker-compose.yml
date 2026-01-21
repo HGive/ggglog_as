@@ -10,11 +10,11 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=3306
-      - DB_USER=${DB_USER:-ggglog}
-      - DB_PASSWORD=${DB_PASSWORD:-ggglog_password}
-      - DB_NAME=${DB_NAME:-ggglog_as}
-      - JWT_SECRET=${JWT_SECRET:-your_jwt_secret_key_here_min_32_chars}
-      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@example.com}
+      - DB_USER=${DB_USER:-gggadmin}
+      - DB_PASSWORD=${DB_PASSWORD:-gggadmin123}
+      - DB_NAME=${DB_NAME:-ggglog}
+      - JWT_SECRET=${JWT_SECRET:-ggglog_jwt_secret_dkn34l32i}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-skyjoon34@naver.com}
       - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
       - SMTP_PORT=${SMTP_PORT:-587}
       - SMTP_USER=${SMTP_USER}

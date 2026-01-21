@@ -62,14 +62,17 @@ CREATE TABLE IF NOT EXISTS admins (
 
 -- ======================================
 -- 초기 관리자 계정 생성
--- 비밀번호: admin123 (bcrypt 해시)
--- 실제 운영 시 반드시 변경하세요!
+-- 기본 비밀번호: admin123
+-- ⚠️ 실제 운영 시 반드시 변경하세요!
 -- ======================================
 INSERT INTO admins (username, password, email) VALUES 
-('admin', '$2a$10$rQEjv5GrKp5F5XRGX5pYd.8xPYJLKMaH5y5yH5e5X5X5X5X5X5X5X', 'admin@example.com')
+('admin', '$2a$10$HBa60uLlJ77tzAswI2G1pe8i7usmv.N.y8Q5tgLD8sMAZBy5TGSUu', 'admin@example.com')
 ON DUPLICATE KEY UPDATE username = username;
 
--- 참고: 위 bcrypt 해시는 예시입니다.
--- 실제 해시는 Node.js에서 생성해야 합니다:
--- const bcrypt = require('bcryptjs');
--- const hash = await bcrypt.hash('admin123', 10);
+-- ======================================
+-- 관리자 비밀번호 변경 방법:
+-- 1. 로컬에서 해시 생성:
+--    node -e "require('bcryptjs').hash('새비밀번호', 10).then(console.log)"
+-- 2. DB에서 업데이트:
+--    UPDATE admins SET password='생성된해시' WHERE username='admin';
+-- ======================================

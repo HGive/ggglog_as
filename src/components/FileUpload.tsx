@@ -10,11 +10,39 @@ interface FileUploadProps {
   error?: string
 }
 
+// 허용된 이미지 파일 확장자
+const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'heif']
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/bmp',
+  'image/heic',
+  'image/heif'
+]
+
+// 파일이 허용된 이미지 형식인지 검증
+const isValidImageFile = (file: File): boolean => {
+  // MIME 타입 체크
+  if (ALLOWED_MIME_TYPES.includes(file.type)) {
+    return true
+  }
+  
+  // 확장자로 추가 체크 (MIME 타입이 없는 경우 대비)
+  const extension = file.name.split('.').pop()?.toLowerCase()
+  if (extension && ALLOWED_IMAGE_EXTENSIONS.includes(extension)) {
+    return true
+  }
+  
+  return false
+}
+
 export default function FileUpload({
   onFilesChange,
   maxSize = 50,
   maxFiles = 10,
-  accept = 'image/*',
+  accept = '.jpg,.jpeg,.png,.gif,.webp,.bmp,.heic,.heif,image/*',
   error,
 }: FileUploadProps) {
   const [files, setFiles] = useState<File[]>([])
@@ -29,6 +57,12 @@ export default function FileUpload({
     const errors: string[] = []
 
     fileArray.forEach((file) => {
+      // 이미지 파일 형식 체크
+      if (!isValidImageFile(file)) {
+        errors.push(`${file.name}: 이미지 파일만 업로드 가능합니다 (jpg, jpeg, png, gif, webp)`)
+        return
+      }
+      
       // 크기 체크
       if (file.size > maxSize * 1024 * 1024) {
         errors.push(`${file.name}: 파일 크기가 ${maxSize}MB를 초과합니다.`)
@@ -126,6 +160,9 @@ export default function FileUpload({
           클릭하거나 파일을 드래그하세요
         </p>
         <p className="text-sm text-gray-400 mt-1">
+          이미지 파일만 가능 (jpg, jpeg, png, gif, webp)
+        </p>
+        <p className="text-sm text-gray-400 mt-0.5">
           최대 {maxFiles}개, 각 파일 {maxSize}MB 이하
         </p>
       </div>
