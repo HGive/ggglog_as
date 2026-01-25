@@ -100,6 +100,7 @@ export default function SearchPage() {
           onChange={handleChange}
           placeholder="성함을 입력해주세요"
           maxLength={10}
+          autoComplete="name"
           required
           error={errors.name}
           helperText={`${formData.name.length}/10`}
@@ -113,6 +114,7 @@ export default function SearchPage() {
           onChange={handleChange}
           placeholder="010-0000-0000"
           maxLength={13}
+          autoComplete="tel"
           required
           error={errors.phone}
         />

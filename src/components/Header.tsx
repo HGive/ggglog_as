@@ -49,7 +49,7 @@ export default function Header() {
               alt="공간기록"
               width={120}
               height={40}
-              style={{ width: 80, height: 'auto' }}
+              style={{ width: 120, height: 'auto' }}
               priority
             />
           </Link>
@@ -105,7 +105,7 @@ export default function Header() {
                 alt="공간기록"
                 width={120}
                 height={40}
-                style={{ width: 140, height: 'auto' }}
+                style={{ width: 120, height: 'auto' }}
               />
             </Link>
             <button

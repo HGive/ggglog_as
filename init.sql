@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS applications (
     designer VARCHAR(50) DEFAULT NULL COMMENT '당시 담당 디자이너',
     title VARCHAR(200) NOT NULL COMMENT 'A/S 신청 제목',
     content TEXT NOT NULL COMMENT 'A/S 신청 내용',
-    status VARCHAR(20) NOT NULL DEFAULT '신청' COMMENT '진행상황',
+    status VARCHAR(20) NOT NULL DEFAULT '01' COMMENT '진행상황 (01:신청, 02:접수완료, 03:담당자 배정, 04:일정 조율 중, 05:A/S 완료, 06:처리완료)',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '신청일시',
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시',
     

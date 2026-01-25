@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import { getStatusLabel } from './status'
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -73,8 +74,9 @@ export async function sendStatusUpdateNotification(
     newStatus: string
   }
 ) {
+  // newStatus는 한글명으로 전달됨 (getStatusLabel로 변환된 값)
   const statusMessages: Record<string, string> = {
-    '접수완료': '접수가 완료되었습니다. 빠르게 해결해드릴게요.',
+    '접수완료': '접수가 완료되었습니다. 빠르게 해결해드리겠습니다.',
     '담당자 배정': '담당자가 배정되었습니다.',
     '일정 조율 중': '일정 조율 중입니다. 곧 연락드리겠습니다.',
     'A/S 완료': 'A/S가 완료되었습니다.',

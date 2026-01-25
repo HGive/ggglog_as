@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Loading from '@/components/Loading'
+import { getStatusLabel } from '@/lib/status'
 
 interface Application {
   id: number
@@ -51,11 +52,10 @@ export default function SearchListPage() {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).replace(/\. /g, '.').replace('.', '')
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}.${month}.${day}`
   }
 
   if (loading) return <Loading />
@@ -109,7 +109,7 @@ export default function SearchListPage() {
                 >
                   <td className="py-4 px-4">{app.title}</td>
                   <td className="py-4 px-4 text-center whitespace-nowrap">{formatDate(app.created_at)}</td>
-                  <td className="py-4 px-4 text-center whitespace-nowrap">{app.status}</td>
+                  <td className="py-4 px-4 text-center whitespace-nowrap">{getStatusLabel(app.status)}</td>
                 </tr>
               ))}
             </tbody>

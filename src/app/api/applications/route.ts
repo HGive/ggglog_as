@@ -74,11 +74,11 @@ export async function POST(request: NextRequest) {
 
     await connection.beginTransaction()
 
-    // 신청 데이터 저장
+    // 신청 데이터 저장 (기본 상태: 01 - 신청)
     const [result] = await connection.execute(
       `INSERT INTO applications 
        (name, phone, email, address, completion_year, site_manager, designer, title, content, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '신청')`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '01')`,
       [name, phone, email, address, completion_year, site_manager, designer, title, content]
     )
 
@@ -100,11 +100,15 @@ export async function POST(request: NextRequest) {
       
       await writeFile(filePath, buffer)
 
+      // 상대 경로 저장 (uploads/applicationId/fileName)
+      // 이렇게 하면 로컬과 Docker 모두에서 작동
+      const relativePath = path.join('uploads', String(applicationId), fileName)
+
       // 첨부파일 정보 저장
       await connection.execute(
         `INSERT INTO attachments (application_id, file_name, file_path, file_size, mime_type)
          VALUES (?, ?, ?, ?, ?)`,
-        [applicationId, file.name, filePath, file.size, file.type]
+        [applicationId, file.name, relativePath, file.size, file.type]
       )
     }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, ChangeEvent } from 'react'
+import imageCompression from 'browser-image-compression'
 
 interface FileUploadProps {
   onFilesChange: (files: File[]) => void
@@ -40,46 +41,128 @@ const isValidImageFile = (file: File): boolean => {
 
 export default function FileUpload({
   onFilesChange,
-  maxSize = 50,
+  maxSize = 5,
   maxFiles = 10,
   accept = '.jpg,.jpeg,.png,.gif,.webp,.bmp,.heic,.heif,image/*',
   error,
 }: FileUploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [dragActive, setDragActive] = useState(false)
+  const [compressing, setCompressing] = useState(false)
+  const [fileErrors, setFileErrors] = useState<Record<number, string>>({})
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleFiles = (newFiles: FileList | null) => {
+  // 이미지 압축 함수
+  const compressImage = async (file: File): Promise<File> => {
+    // 원본 파일 크기 확인
+    const originalSizeMB = file.size / (1024 * 1024)
+    
+    // 1MB 이하는 압축하지 않음
+    if (originalSizeMB <= 1) {
+      return file
+    }
+
+    // 압축 옵션 (1-5MB 파일용)
+    const options = {
+      maxSizeMB: 1, // 최종 목표 크기 (1MB 이하)
+      maxWidthOrHeight: 1920, // 최대 해상도
+      useWebWorker: true,
+      fileType: file.type.includes('png') ? 'image/jpeg' : file.type,
+      initialQuality: 0.8,
+    }
+
+    try {
+      const compressedFile = await imageCompression(file, options)
+      const compressedSizeMB = compressedFile.size / (1024 * 1024)
+      
+      // 압축 결과가 원본보다 큰 경우 원본 반환
+      if (compressedFile.size >= file.size) {
+        console.warn('압축 후 크기가 더 큽니다. 원본 파일을 사용합니다.')
+        return file
+      }
+      
+      // 원본 파일명 유지 (압축된 파일의 name이 변경될 수 있으므로)
+      const originalFileName = file.name
+      const newFile = new File([compressedFile], originalFileName, {
+        type: compressedFile.type,
+        lastModified: file.lastModified,
+      })
+      
+      console.log(`압축 완료: ${originalSizeMB.toFixed(1)}MB → ${compressedSizeMB.toFixed(1)}MB`)
+      return newFile
+    } catch (error) {
+      console.error('Image compression error:', error)
+      console.warn('압축 실패, 원본 파일로 업로드합니다.')
+      // 압축 실패 시 원본 파일 반환
+      return file
+    }
+  }
+
+
+  const handleFiles = async (newFiles: FileList | null) => {
     if (!newFiles) return
 
     const fileArray = Array.from(newFiles)
+    const newErrors: Record<number, string> = {}
     const validFiles: File[] = []
-    const errors: string[] = []
+    const currentFileCount = files.length
 
-    fileArray.forEach((file) => {
+    setCompressing(true)
+
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i]
+      const fileIndex = currentFileCount + i
+
       // 이미지 파일 형식 체크
       if (!isValidImageFile(file)) {
-        errors.push(`${file.name}: 이미지 파일만 업로드 가능합니다 (jpg, jpeg, png, gif, webp)`)
-        return
+        newErrors[fileIndex] = '이미지 파일만 업로드 가능합니다 (jpg, jpeg, png, gif, webp)'
+        continue
       }
       
-      // 크기 체크
+      // 크기 체크 (5MB 초과 시 에러)
       if (file.size > maxSize * 1024 * 1024) {
-        errors.push(`${file.name}: 파일 크기가 ${maxSize}MB를 초과합니다.`)
-        return
+        newErrors[fileIndex] = `파일 크기가 ${maxSize}MB를 초과합니다.`
+        continue
       }
-      validFiles.push(file)
-    })
+
+      // 1MB 이하는 압축하지 않고, 1MB 초과는 압축
+      try {
+        const processedFile = await compressImage(file)
+        validFiles.push(processedFile)
+      } catch (error) {
+        console.error('File processing error:', error)
+        newErrors[fileIndex] = '파일 처리 중 오류가 발생했습니다.'
+      }
+    }
 
     // 최대 파일 수 체크
     const totalFiles = [...files, ...validFiles].slice(0, maxFiles)
-    
-    if (errors.length > 0) {
-      alert(errors.join('\n'))
+    const remainingSlots = maxFiles - files.length
+    if (validFiles.length > remainingSlots) {
+      // 초과된 파일에 대한 에러 추가
+      validFiles.slice(remainingSlots).forEach((_, idx) => {
+        newErrors[currentFileCount + validFiles.length - remainingSlots + idx] = 
+          `최대 ${maxFiles}개까지만 업로드 가능합니다.`
+      })
     }
 
+    setFileErrors(prev => ({ ...prev, ...newErrors }))
     setFiles(totalFiles)
     onFilesChange(totalFiles)
+    setCompressing(false)
+
+    // 에러 메시지 3초 후 자동 제거
+    if (Object.keys(newErrors).length > 0) {
+      setTimeout(() => {
+        setFileErrors(prev => {
+          const updated = { ...prev }
+          Object.keys(newErrors).forEach(key => {
+            delete updated[Number(key)]
+          })
+          return updated
+        })
+      }, 3000)
+    }
   }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -107,6 +190,10 @@ export default function FileUpload({
     const newFiles = files.filter((_, i) => i !== index)
     setFiles(newFiles)
     onFilesChange(newFiles)
+    // 해당 파일의 에러도 제거
+    const newErrors = { ...fileErrors }
+    delete newErrors[index]
+    setFileErrors(newErrors)
   }
 
   const formatFileSize = (bytes: number) => {
@@ -165,7 +252,21 @@ export default function FileUpload({
         <p className="text-sm text-gray-400 mt-0.5">
           최대 {maxFiles}개, 각 파일 {maxSize}MB 이하
         </p>
+        {compressing && (
+          <p className="text-sm text-blue-600 mt-2">이미지 압축 중...</p>
+        )}
       </div>
+
+      {/* 파일별 에러 메시지 */}
+      {Object.keys(fileErrors).length > 0 && (
+        <div className="mt-2 space-y-1">
+          {Object.entries(fileErrors).map(([index, errorMsg]) => (
+            <p key={index} className="text-sm text-red-500">
+              {errorMsg}
+            </p>
+          ))}
+        </div>
+      )}
 
       {error && (
         <p className="mt-1 text-sm text-red-500">{error}</p>
@@ -195,7 +296,12 @@ export default function FileUpload({
                 )}
                 <div>
                   <p className="text-sm font-medium truncate max-w-[200px]">{file.name}</p>
-                  <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                  <p className="text-xs text-gray-500">
+                    {formatFileSize(file.size)}
+                    {file.size < 1024 * 1024 && file.size < (files.find(f => f.name === file.name)?.size || file.size) && (
+                      <span className="text-green-600 ml-1">(압축됨)</span>
+                    )}
+                  </p>
                 </div>
               </div>
               <button

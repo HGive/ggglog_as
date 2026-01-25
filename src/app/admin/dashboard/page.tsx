@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Loading from '@/components/Loading'
+import { getStatusLabel } from '@/lib/status'
 
 interface Application {
   id: number
@@ -117,11 +118,10 @@ export default function AdminDashboardPage() {
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).replace(/\. /g, '.').replace('.', '')
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}.${month}.${day}`
   }
 
   if (loading) return <Loading />
@@ -137,7 +137,7 @@ export default function AdminDashboardPage() {
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm text-gray-600 mb-1">이름</label>
+            <label className="hidden md:block text-sm text-gray-600 mb-1">이름</label>
             <input
               type="text"
               name="name"
@@ -148,7 +148,7 @@ export default function AdminDashboardPage() {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">연락처</label>
+            <label className="hidden md:block text-sm text-gray-600 mb-1">연락처</label>
             <input
               type="text"
               name="phone"
@@ -159,7 +159,7 @@ export default function AdminDashboardPage() {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">제목</label>
+            <label className="hidden md:block text-sm text-gray-600 mb-1">제목</label>
             <input
               type="text"
               name="title"
@@ -170,22 +170,24 @@ export default function AdminDashboardPage() {
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">시작일</label>
+            <label className="hidden md:block text-sm text-gray-600 mb-1">시작일</label>
             <input
               type="date"
               name="startDate"
               value={filters.startDate}
               onChange={handleFilterChange}
+              placeholder="시작일"
               className="w-full border rounded px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label className="block text-sm text-gray-600 mb-1">종료일</label>
+            <label className="hidden md:block text-sm text-gray-600 mb-1">종료일</label>
             <input
               type="date"
               name="endDate"
               value={filters.endDate}
               onChange={handleFilterChange}
+              placeholder="종료일"
               className="w-full border rounded px-3 py-2 text-sm"
             />
           </div>
@@ -216,13 +218,12 @@ export default function AdminDashboardPage() {
                 <th className="py-3 px-4 text-left font-medium text-sm">제목</th>
                 <th className="py-3 px-4 text-center font-medium text-sm">신청일</th>
                 <th className="py-3 px-4 text-center font-medium text-sm">진행상황</th>
-                <th className="py-3 px-4 text-center font-medium text-sm">상세</th>
               </tr>
             </thead>
             <tbody>
               {filteredApplications.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-500">
+                  <td colSpan={5} className="py-12 text-center text-gray-500">
                     신청 내역이 없습니다.
                   </td>
                 </tr>
@@ -230,7 +231,8 @@ export default function AdminDashboardPage() {
                 filteredApplications.map((app) => (
                   <tr
                     key={app.id}
-                    className="border-b hover:bg-gray-50 transition-colors"
+                    className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/admin/detail?id=${app.id}`)}
                   >
                     <td className="py-3 px-4">{app.name}</td>
                     <td className="py-3 px-4">{app.phone}</td>
@@ -238,20 +240,13 @@ export default function AdminDashboardPage() {
                     <td className="py-3 px-4 text-center">{formatDate(app.created_at)}</td>
                     <td className="py-3 px-4 text-center">
                       <span className={`inline-block px-2 py-1 rounded text-xs ${
-                        app.status === '처리완료' ? 'bg-green-100 text-green-800' :
-                        app.status === '신청' ? 'bg-gray-100 text-gray-800' :
-                        'bg-blue-100 text-blue-800'
+                        app.status === '01' ? 'bg-gray-100 text-gray-800' :
+                        ['02', '03', '04'].includes(app.status) ? 'bg-blue-100 text-blue-800' :
+                        ['05', '06'].includes(app.status) ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
                       }`}>
-                        {app.status}
+                        {getStatusLabel(app.status)}
                       </span>
-                    </td>
-                    <td className="py-3 px-4 text-center">
-                      <Link
-                        href={`/admin/detail?id=${app.id}`}
-                        className="text-blue-600 hover:underline text-sm"
-                      >
-                        보기
-                      </Link>
                     </td>
                   </tr>
                 ))

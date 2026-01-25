@@ -47,20 +47,5 @@ export interface Admin {
   created_at: Date
 }
 
-// 진행 상태 타입
-export type ApplicationStatus = 
-  | '신청'
-  | '접수완료'
-  | '담당자 배정'
-  | '일정 조율 중'
-  | 'A/S 완료'
-  | '처리완료'
-
-export const APPLICATION_STATUSES: ApplicationStatus[] = [
-  '신청',
-  '접수완료',
-  '담당자 배정',
-  '일정 조율 중',
-  'A/S 완료',
-  '처리완료'
-]
+// 상태 관련 함수는 src/lib/status.ts로 이동했습니다
+// 클라이언트 컴포넌트에서 사용 가능하도록 분리

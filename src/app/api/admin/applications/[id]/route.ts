@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { getCurrentAdmin } from '@/lib/auth'
 import { sendStatusUpdateNotification } from '@/lib/email'
+import { STATUS_CODES, getStatusLabel } from '@/lib/status'
 import { RowDataPacket } from 'mysql2'
 
 // GET: 신청 상세 조회 (관리자용)
@@ -79,11 +80,10 @@ export async function PATCH(
       )
     }
 
-    // 유효한 상태값 확인
-    const validStatuses = ['신청', '접수완료', '담당자 배정', '일정 조율 중', 'A/S 완료', '처리완료']
-    if (!validStatuses.includes(status)) {
+    // 유효한 상태 코드 확인
+    if (!STATUS_CODES.includes(status as any)) {
       return NextResponse.json(
-        { message: '유효하지 않은 상태값입니다' },
+        { message: '유효하지 않은 상태 코드입니다' },
         { status: 400 }
       )
     }
@@ -114,7 +114,7 @@ export async function PATCH(
       sendStatusUpdateNotification(application.email, {
         name: application.name,
         title: application.title,
-        newStatus: status,
+        newStatus: getStatusLabel(status), // 상태 코드를 한글명으로 변환
       }).catch(console.error)
     }
 

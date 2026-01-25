@@ -57,7 +57,13 @@ export default function ApplyPage() {
     if (name === 'phone') {
       const formattedPhone = formatPhoneNumber(value)
       setFormData(prev => ({ ...prev, [name]: formattedPhone }))
-    } else {
+    } 
+    // 완공년도: 숫자만 허용
+    else if (name === 'completion_year') {
+      const numbersOnly = value.replace(/[^\d]/g, '')
+      setFormData(prev => ({ ...prev, [name]: numbersOnly }))
+    } 
+    else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
     
@@ -201,6 +207,7 @@ export default function ApplyPage() {
             onChange={handleChange}
             placeholder="성함을 입력해주세요"
             maxLength={10}
+            autoComplete="name"
             required
             error={errors.name}
             helperText={`${formData.name.length}/10`}
@@ -215,6 +222,7 @@ export default function ApplyPage() {
             onChange={handleChange}
             placeholder="010-0000-0000"
             maxLength={13}
+            autoComplete="tel"
             required
             error={errors.phone}
             data-error={!!errors.phone}
@@ -227,6 +235,7 @@ export default function ApplyPage() {
             value={formData.email}
             onChange={handleChange}
             placeholder="example@email.com"
+            autoComplete="email"
             helperText="*A/S 진행사항은 이메일로 확인하실 수 있습니다"
             required
             error={errors.email}
@@ -310,7 +319,7 @@ export default function ApplyPage() {
 
           <FileUpload
             onFilesChange={setFiles}
-            maxSize={50}
+            maxSize={5}
             maxFiles={10}
             accept="image/*"
             error={errors.files}
