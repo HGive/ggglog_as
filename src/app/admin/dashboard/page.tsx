@@ -124,11 +124,6 @@ export default function AdminDashboardPage() {
     }).replace(/\. /g, '.').replace('.', '')
   }
 
-  const handleLogout = async () => {
-    await fetch('/api/admin/logout', { method: 'POST' })
-    router.push('/admin/login')
-  }
-
   if (loading) return <Loading />
 
   return (
@@ -136,12 +131,6 @@ export default function AdminDashboardPage() {
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold">A/S 신청 관리</h1>
-        <button
-          onClick={handleLogout}
-          className="text-gray-500 hover:text-black"
-        >
-          로그아웃
-        </button>
       </div>
 
       {/* 검색 필터 */}

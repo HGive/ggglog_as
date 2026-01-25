@@ -31,17 +31,18 @@
   font-style: normal;
 }
 
-/* 필기체 폰트 (epilogue, living guide용) */
+/* 필기체 폰트 (epilogue, living guide용) - Ellie Script */
 @font-face {
-  font-family: 'Caveat';
-  src: url('https://fonts.gstatic.com/s/caveat/v18/WnznHAc5bAfYB2QRah7pcpNvOx-pjfJ9SIKjYBxPigs.woff2') format('woff2');
+  font-family: 'Ellie Script';
+  src: url('/fonts/Ellie-Script.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 :root {
   --font-pretendard: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-  --font-epilogue: 'Caveat', cursive;
+  --font-epilogue: 'Ellie Script', 'Caveat', cursive;
 }
 
 * {

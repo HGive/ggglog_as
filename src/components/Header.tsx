@@ -1,22 +1,66 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import Image from 'next/image'
+import { usePathname, useRouter } from 'next/navigation'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  
+  // 관리자 로그인 상태 확인
+  useEffect(() => {
+    if (pathname.startsWith('/admin')) {
+      const checkAuth = async () => {
+        try {
+          const response = await fetch('/api/admin/applications', {
+            method: 'GET',
+            credentials: 'include',
+          })
+          setIsAdminLoggedIn(response.ok)
+        } catch {
+          setIsAdminLoggedIn(false)
+        }
+      }
+      checkAuth()
+    }
+  }, [pathname])
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' })
+      router.push('/admin/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+  }
   
   // 관리자 페이지에서는 다른 헤더 사용
   if (pathname.startsWith('/admin')) {
     return (
       <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
         <div className="flex items-center justify-between px-6 py-4">
-          <Link href="/admin/dashboard" className="text-xl font-bold tracking-wide">
-            ㄱㄱㄱ트
+          <Link href="/admin/dashboard">
+            <Image
+              src="/images/ggglog-logo.png"
+              alt="공간기록"
+              width={120}
+              height={40}
+              style={{ width: 80, height: 'auto' }}
+              priority
+            />
           </Link>
-          <span className="text-sm text-gray-500">관리자</span>
+          {isAdminLoggedIn && (
+            <button
+              onClick={handleLogout}
+              className="text-sm text-gray-500 hover:text-black transition-colors"
+            >
+              로그아웃
+            </button>
+          )}
         </div>
       </header>
     )
@@ -27,8 +71,15 @@ export default function Header() {
       <header className="sticky top-0 z-50 bg-white">
         <div className="flex items-center justify-between px-6 py-4">
           {/* 로고 */}
-          <Link href="/" className="text-xl font-bold tracking-wide">
-            ㄱㄱㄱ트
+          <Link href="/">
+            <Image
+              src="/images/ggglog-logo.png"
+              alt="공간기록"
+              width={140}
+              height={40}
+              style={{ width: 120, height: 'auto' }}
+              priority
+            />
           </Link>
           
           {/* 햄버거 메뉴 버튼 */}
@@ -48,8 +99,14 @@ export default function Header() {
       {isMenuOpen && (
         <div className="fixed inset-0 z-50 bg-white">
           <div className="flex items-center justify-between px-6 py-4">
-            <Link href="/" className="text-xl font-bold tracking-wide" onClick={() => setIsMenuOpen(false)}>
-              ㄱㄱㄱ트
+            <Link href="/" onClick={() => setIsMenuOpen(false)}>
+              <Image
+                src="/images/ggglog-logo.png"
+                alt="공간기록"
+                width={120}
+                height={40}
+                style={{ width: 140, height: 'auto' }}
+              />
             </Link>
             <button
               onClick={() => setIsMenuOpen(false)}

@@ -247,7 +247,7 @@ export default function GuidePage() {
       {/* 검색 영역 - 상단 고정 */}
       <div className="sticky top-0 bg-white pt-6 pb-4 z-20 -mx-6 px-6 shadow-sm">
         {/* 타이틀 */}
-        <h1 className="font-handwriting text-4xl text-center mb-4">
+        <h1 className="font-handwriting text-6xl text-center mb-4">
           living guide
         </h1>
 

@@ -4,12 +4,12 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] px-6">
       {/* 필기체 로고 */}
-      <h1 className="font-handwriting text-6xl md:text-7xl mb-6">
+      <h1 className="font-handwriting text-8xl md:text-7xl mb-6">
         epilogue
       </h1>
       
       {/* 소개 텍스트 */}
-      <p className="text-center text-lg mb-2">완공 후의 이야기,</p>
+      <p className="text-center text-lg mb-1">완공 후의 이야기,</p>
       <p className="text-center text-lg mb-16">공간기록 애프터서비스 센터</p>
       
       {/* 메뉴 버튼들 */}

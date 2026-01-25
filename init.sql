@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS admins (
 -- ⚠️ 실제 운영 시 반드시 변경하세요!
 -- ======================================
 INSERT INTO admins (username, password, email) VALUES 
-('admin', '$2a$10$HBa60uLlJ77tzAswI2G1pe8i7usmv.N.y8Q5tgLD8sMAZBy5TGSUu', 'admin@example.com')
+('admin', '$2a$10$NM5GvCI7bt8bDm4vAEBgoeVCJhhlS.o36SEMHoIuzMDHFMVw2QQoC', 'skyjoon34@naver.com')
 ON DUPLICATE KEY UPDATE username = username;
 
 -- ======================================
