@@ -3,6 +3,8 @@ import pool from '@/lib/db'
 import { getCurrentAdmin } from '@/lib/auth'
 import { RowDataPacket } from 'mysql2'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 전체 신청 목록 조회 (관리자용)
 export async function GET() {
   try {

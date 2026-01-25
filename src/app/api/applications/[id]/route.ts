@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/db'
 import { RowDataPacket } from 'mysql2'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 신청 상세 조회
 export async function GET(
   request: NextRequest,

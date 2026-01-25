@@ -6,6 +6,8 @@ import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 import { RowDataPacket } from 'mysql2'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 신청 목록 조회 (성함+연락처로 필터링)
 export async function GET(request: NextRequest) {
   try {

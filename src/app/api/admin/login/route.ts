@@ -4,6 +4,8 @@ import { compare } from 'bcryptjs'
 import { createToken, setTokenCookie } from '@/lib/auth'
 import { RowDataPacket } from 'mysql2'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()

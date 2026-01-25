@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Stepper from '@/components/Stepper'
 import Loading from '@/components/Loading'
@@ -30,7 +30,7 @@ interface Application {
   attachments: Attachment[]
 }
 
-export default function SearchDetailPage() {
+function SearchDetailContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const name = searchParams.get('name')
@@ -283,5 +283,13 @@ export default function SearchDetailPage() {
         </button>
       </div>
     </div>
+  )
+}
+
+export default function SearchDetailPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <SearchDetailContent />
+    </Suspense>
   )
 }

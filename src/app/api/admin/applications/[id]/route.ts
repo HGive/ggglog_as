@@ -5,6 +5,8 @@ import { sendStatusUpdateNotification } from '@/lib/email'
 import { STATUS_CODES, getStatusLabel } from '@/lib/status'
 import { RowDataPacket } from 'mysql2'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 신청 상세 조회 (관리자용)
 export async function GET(
   request: NextRequest,

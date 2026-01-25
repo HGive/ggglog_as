@@ -4,6 +4,8 @@ import { readFile } from 'fs/promises'
 import path from 'path'
 import { RowDataPacket } from 'mysql2'
 
+export const dynamic = 'force-dynamic'
+
 // GET: 파일 다운로드
 export async function GET(
   request: NextRequest,
