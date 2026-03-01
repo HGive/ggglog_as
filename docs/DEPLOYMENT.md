@@ -69,31 +69,7 @@ nano .env
 ```
 
 **.env 파일 내용:**
-```env
-# Database
-DB_HOST=db
-DB_PORT=3306
-DB_USER=ggglog
-DB_PASSWORD=안전한_비밀번호_입력
-DB_NAME=ggglog_as
-DB_ROOT_PASSWORD=루트_비밀번호_입력
-
-# JWT
-JWT_SECRET=32자_이상의_랜덤_문자열_입력
-
-# Admin Email
-ADMIN_EMAIL=admin@yourdomain.com
-
-# SMTP (Gmail 앱 비밀번호: https://myaccount.google.com/apppasswords)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email@gmail.com
-SMTP_PASS=앱_비밀번호_입력
-SMTP_FROM=공간기록 A/S센터 <your_email@gmail.com>
-
-# App
-NEXT_PUBLIC_BASE_URL=https://yourdomain.com
-```
+.env.example 참고
 
 > 💡 **참고**: `docker-compose.yml`의 `${DB_USER:-ggglog}` 문법은 
 > "DB_USER 환경변수가 있으면 그 값을 쓰고, 없으면 ggglog를 기본값으로 사용"이라는 의미입니다.

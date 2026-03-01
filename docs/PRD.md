@@ -521,3 +521,14 @@ ggglog_as/
 - [x] 상태 코드-라벨 매핑 모듈 (status.ts)
 - [x] Next.js Middleware 기반 인증 가드
 - [x] 관리자 상태 변경 시 고객 이메일 자동 발송 (전 상태 코드)
+- [ ] 문의관리 메뉴 추가
+- [ ] ai요청 rag도입. 가이드 텍스트 미리 임베딩. 질문에 관련된 문맥만 retrieve 후 대답. (토큰 비용 줄이기 위함)
+- [ ] AI 채팅 사용량 제한 (IP 기반 하루 50턴)
+  - 방법: MariaDB에 `chat_usage` 테이블 추가 (`ip VARCHAR(45)`, `usage_date DATE`, `count INT`)
+  - `/api/guide/chat` 호출 시 IP 확인 → 하루 50회 초과 시 HTTP 429 반환
+  - 날짜 컬럼으로 일별 자동 리셋 (별도 cron 불필요)
+  - IP는 `X-Forwarded-For` 헤더 우선 사용 (nginx 리버스 프록시 환경)
+  - 한계: VPN/프록시 우회 가능하나 일반 사용자 대상으론 충분
+
+
+
