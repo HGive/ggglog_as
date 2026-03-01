@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation'
 export default function Footer() {
   const pathname = usePathname()
   
-  // 관리자 페이지에서는 푸터 숨김
-  if (pathname === '/' || pathname.startsWith('/admin')) {
+  // 홈, 관리자, 가이드 페이지에서는 푸터 숨김
+  if (pathname === '/' || pathname.startsWith('/admin') || pathname === '/guide') {
     return null
   }
 

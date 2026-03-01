@@ -14,11 +14,19 @@ export default function Stepper({ currentStatus }: StepperProps) {
   
   const currentIndex = statusCode ? STATUS_CODES.indexOf(statusCode) : -1
   
+  const stepCount = STATUS_CODES.length
+  // 첫 번째 원의 중심 ~ 마지막 원의 중심 (동일 너비 칸 기준: 1/12 ~ 11/12)
+  const lineLeft = `${100 / (stepCount * 2)}%`
+  const lineRight = lineLeft
+
   return (
-    <div className="w-full py-4 px-0 md:px-12">
-      <div className="flex items-center justify-between relative">
-        {/* 연결선 */}
-        <div className="absolute top-3 left-0 right-0 h-0.5 bg-gray-300 -z-10" />
+    <div className="w-full py-4 px-0 md:px-2">
+      <div className="flex items-center relative">
+        {/* 연결선: 첫 원 중심 ~ 마지막 원 중심 */}
+        <div
+          className="absolute top-3 h-0.5 bg-gray-300 -z-10"
+          style={{ left: lineLeft, right: lineRight }}
+        />
         
         {STATUS_CODES.map((code, index) => {
           const isCompleted = index <= currentIndex // 완료된 상태 (현재 상태 포함)
@@ -37,7 +45,7 @@ export default function Stepper({ currentStatus }: StepperProps) {
           }
           
           return (
-            <div key={code} className="flex flex-col items-center">
+            <div key={code} className="flex-1 flex flex-col items-center min-w-0">
               {/* 원형 마커 */}
               <div
                 className={`w-6 h-6 rounded-full border-2 flex items-center justify-center
